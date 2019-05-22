@@ -1,0 +1,26 @@
+{
+  "name": "flashcms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "init.js",
+  "scripts": {
+    "watch": "./node_modules/.bin/nodemon init.js"
+  },
+  "repository": "git+https://github.com/didid08/flashcms.git",
+  "keywords": [
+    "cms"
+  ],
+  "author": "Didid",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/didid08/flashcms/issues"
+  },
+  "homepage": "https://github.com/didid08/flashcms#readme",
+  "private": true,
+  "dependencies": {
+    "@hapi/hapi": "^18.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

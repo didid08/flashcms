@@ -41,6 +41,9 @@ const main = async () => {
                     case "accounts":
                         collection = await DBSchemas.accounts.findOne({"auth.username": request.params.criteria}).exec();
                     break;
+                    case "contents":
+                        collection = await DBSchemas.contents.findOne({"contentId": request.params.criteria}).exec();
+                    break;
                 }
                 return h.response(collection);
             } catch (error) {
@@ -63,6 +66,9 @@ const main = async () => {
                     case "accounts":
                         collection = await DBSchemas.accounts.find().exec();
                     break;
+                    case "contents":
+                        collection = await DBSchemas.contents.find().exec();
+                    break;
                 }
                 return h.response(collection);
             } catch (error) {
@@ -84,6 +90,9 @@ const main = async () => {
                     break;
                     case "accounts":
                         collection = new DBSchemas.accounts(request.payload);
+                    break;
+                    case "contents":
+                        collection = new DBSchemas.contents(request.payload);
                     break;
                 }
                 var result = await collection.save();
@@ -108,6 +117,9 @@ const main = async () => {
                     case "accounts":
                         result = await DBSchemas.accounts.findOneAndUpdate({"auth.username": request.params.criteria}, request.payload, { new: true });
                     break;
+                    case "contents":
+                        result = await DBSchemas.contents.findOneAndUpdate({"contentId": request.params.criteria}, request.payload, { new: true });
+                    break;
                 }
                 return h.response(result);
             } catch (error) {
@@ -130,6 +142,9 @@ const main = async () => {
                     case "accounts":
                         result = await DBSchemas.accounts.findOneAndDelete({"auth.username": request.params.criteria});
                     break;
+                    case "contents":
+                        result = await DBSchemas.contents.findOneAndDelete({"contentId": request.params.criteria});
+                    break;
                 }
                 return h.response(result);
             } catch (error) {
@@ -147,7 +162,7 @@ const main = async () => {
 }
 
 main()
-.then((server) => console.log(`Server listening on ${server.info.uri}`))
+.then((server) => console.log(`# Flashcms Development Server\nListening on ${server.info.uri}`))
 .catch((err) => {
     console.error(err);
     process.exit(1);

@@ -27,16 +27,44 @@ const main = async () => {
 /** Database REST API Section **/
 /*******************************/
 
-/* Settings's Data Manager */
-
-    // Fetch Data
+    //Fetch Single Document
     server.route({
         method: "GET",
-        path: "/settings/{dataId}",
+        path: "/data/db/{collection}/{criteria}",
         handler: async (request, h) => {
             try {
-                var settings = await DBSchemas.settings.findOne({"dataId": request.params.dataId}).exec();
-                return h.response(settings);
+                var collection;
+                switch(request.params.collection){
+                    case "settings":
+                        collection = await DBSchemas.settings.findOne({"dataId": request.params.criteria}).exec();
+                    break;
+                    case "accounts":
+                        collection = await DBSchemas.accounts.findOne({"auth.username": request.params.criteria}).exec();
+                    break;
+                }
+                return h.response(collection);
+            } catch (error) {
+                return h.response(error).code(500);
+            }
+        }
+    });
+
+    //Fetch All Documents
+    server.route({
+        method: "GET",
+        path: "/data/db/{collection}",
+        handler: async (request, h) => {
+            try {
+                var collection;
+                switch(request.params.collection){
+                    case "settings":
+                        collection = await DBSchemas.settings.find().exec();
+                    break;
+                    case "accounts":
+                        collection = await DBSchemas.accounts.find().exec();
+                    break;
+                }
+                return h.response(collection);
             } catch (error) {
                 return h.response(error).code(500);
             }
@@ -46,11 +74,19 @@ const main = async () => {
     // Insert Data
     server.route({
         method: "POST",
-        path: "/settings",
+        path: "/data/db/{collection}",
         handler: async (request, h) => {
             try {
-                var settings = new DBSchemas.settings(request.payload);
-                var result = await settings.save();
+                var collection;
+                switch(request.params.collection){
+                    case "settings":
+                        collection = new DBSchemas.settings(request.payload);
+                    break;
+                    case "accounts":
+                        collection = new DBSchemas.accounts(request.payload);
+                    break;
+                }
+                var result = await collection.save();
                 return h.response(result);
             } catch (error) {
                 return h.response(error).code(500);
@@ -58,13 +94,21 @@ const main = async () => {
         }
     });
 
-    // Update Data
+    //Edit Data
     server.route({
         method: "PUT",
-        path: "/settings/{dataId}",
+        path: "/data/db/{collection}/{criteria}",
         handler: async (request, h) => {
             try {
-                var result = await DBSchemas.settings.findOneAndUpdate({"dataId": request.params.dataId}, request.payload, { new: true });
+                var result;
+                switch(request.params.collection){
+                    case "settings":
+                        result = await DBSchemas.settings.findOneAndUpdate({"dataId": request.params.criteria}, request.payload, { new: true });
+                    break;
+                    case "accounts":
+                        result = await DBSchemas.accounts.findOneAndUpdate({"auth.username": request.params.criteria}, request.payload, { new: true });
+                    break;
+                }
                 return h.response(result);
             } catch (error) {
                 return h.response(error).code(500);
@@ -72,92 +116,27 @@ const main = async () => {
         }
     });
 
-    // Delete Data
+    //Delete Data
     server.route({
         method: "DELETE",
-        path: "/settings/{dataId}",
+        path: "/data/db/{collection}/{criteria}",
         handler: async (request, h) => {
             try {
-                var result = await DBSchemas.settings.findOneAndDelete({"dataId": request.params.dataId});
+                var result;
+                switch(request.params.collection){
+                    case "settings":
+                        result = await DBSchemas.settings.findOneAndDelete({"dataId": request.params.criteria});
+                    break;
+                    case "accounts":
+                        result = await DBSchemas.accounts.findOneAndDelete({"auth.username": request.params.criteria});
+                    break;
+                }
                 return h.response(result);
             } catch (error) {
                 return h.response(error).code(500);
             }
         }
-    });
-
-/* Accounts's Data Manager */
-
-    // Fetch Data
-    server.route({
-        method: "GET",
-        path: "/account/{username}",
-        handler: async (request, h) => {
-            try {
-                var account = await DBSchemas.accounts.findOne({"auth.username": request.params.username}).exec();
-                return h.response(account);
-            } catch (error) {
-                return h.response(error).code(500);
-            }
-        }
-    });
-
-    // Fetch All Data
-    server.route({
-        method: "GET",
-        path: "/accounts",
-        handler: async (request, h) => {
-            try {
-                var accounts = await DBSchemas.accounts.find().exec();
-                return h.response(accounts);
-            } catch (error) {
-                return h.response(error).code(500);
-            }
-        }
-    });
-
-    // Insert Data
-    server.route({
-        method: "POST",
-        path: "/accounts",
-        handler: async (request, h) => {
-            try {
-                var account = new DBSchemas.accounts(request.payload);
-                var result = await account.save();
-                return h.response(result);
-            } catch (error) {
-                return h.response(error).code(500);
-            }
-        }
-    });
-
-    // Update Data
-    server.route({
-        method: "PUT",
-        path: "/account/{username}",
-        handler: async (request, h) => {
-            try {
-                var result = await DBSchemas.accounts.findOneAndUpdate({"auth.username": request.params.username}, request.payload, { new: true });
-                return h.response(result);
-            } catch (error) {
-                return h.response(error).code(500);
-            }
-        }
-    });
-
-    // Delete Data
-    server.route({
-        method: "DELETE",
-        path: "/account/{username}",
-        handler: async (request, h) => {
-            try {
-                var result = await DBSchemas.accounts.findOneAndDelete({"auth.username": request.params.username});
-                return h.response(result);
-            } catch (error) {
-                return h.response(error).code(500);
-            }
-        }
-    });    
+    });  
 
 /**************************************/
 /** End of Database REST API Section **/

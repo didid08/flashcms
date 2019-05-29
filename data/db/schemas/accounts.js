@@ -21,10 +21,8 @@ const Accounts = Mongoose.model("accounts", {
  * F_ADMIN = Allow to Modify All Data And Settings except User Info
  * F_USER = Allow to Add and Edit Content
  * F_CUSTOMIZE = Allow to Modify Layout and Style
- * F_MOD
- * F_PRY
- * F_POST
- * F_BASIC 
+ * F_MOD = Allow to Modify Addons
+ * F_BASIC = Basic Permissions
  */
 
 module.exports = Accounts;

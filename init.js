@@ -7,6 +7,7 @@ const Basic = require("@hapi/basic");
 
 const Mongoose = require("mongoose");
 const Bcrypt = require("bcrypt");
+const Qs = require('qs');
 
 const DBSchemas = {
     settings: require("./data/db/schemas/settings.js"),
@@ -21,7 +22,14 @@ Mongoose.connect("mongodb://"+
 { useNewUrlParser: true });
 
 const main = async () => {
-    const server = new Hapi.Server({ "host": Config.server.host, "port": Config.server.port });
+
+    const server = new Hapi.Server({
+        host: Config.server.host,
+        port: Config.server.port,
+        query: {
+            parser: (query) => Qs.parse(query)
+        }
+    });
 
 /*******************************/
 /** Database REST API Section **/
@@ -30,19 +38,19 @@ const main = async () => {
     //Fetch Single Document
     server.route({
         method: "GET",
-        path: "/data/db/{collection}/{criteria}",
+        path: "/data/db/single/{collection}",
         handler: async (request, h) => {
             try {
                 var collection;
                 switch(request.params.collection){
                     case "settings":
-                        collection = await DBSchemas.settings.findOne({"dataId": request.params.criteria}).exec();
+                        collection = await DBSchemas.settings.findOne(request.query).exec();
                     break;
                     case "accounts":
-                        collection = await DBSchemas.accounts.findOne({"auth.username": request.params.criteria}).exec();
+                        collection = await DBSchemas.accounts.findOne(request.query).exec();
                     break;
                     case "contents":
-                        collection = await DBSchemas.contents.findOne({"contentId": request.params.criteria}).exec();
+                        collection = await DBSchemas.contents.findOne(request.query).exec();
                     break;
                 }
                 return h.response(collection);
@@ -61,13 +69,13 @@ const main = async () => {
                 var collection;
                 switch(request.params.collection){
                     case "settings":
-                        collection = await DBSchemas.settings.find().exec();
+                        collection = await DBSchemas.settings.find(request.query).exec();
                     break;
                     case "accounts":
-                        collection = await DBSchemas.accounts.find().exec();
+                        collection = await DBSchemas.accounts.find(request.query).exec();
                     break;
                     case "contents":
-                        collection = await DBSchemas.contents.find().exec();
+                        collection = await DBSchemas.contents.find(request.query).exec();
                     break;
                 }
                 return h.response(collection);
@@ -77,7 +85,9 @@ const main = async () => {
         }
     });
 
-    // Insert Data
+
+
+    // Insert Single Data
     server.route({
         method: "POST",
         path: "/data/db/{collection}",
@@ -93,6 +103,7 @@ const main = async () => {
                     break;
                     case "contents":
                         collection = new DBSchemas.contents(request.payload);
+                        collection.markModified("data.main");
                     break;
                 }
                 var result = await collection.save();
@@ -103,22 +114,23 @@ const main = async () => {
         }
     });
 
-    //Edit Data
+    //Edit Single Data
     server.route({
         method: "PUT",
-        path: "/data/db/{collection}/{criteria}",
+        path: "/data/db/single/{collection}",
         handler: async (request, h) => {
             try {
                 var result;
                 switch(request.params.collection){
                     case "settings":
-                        result = await DBSchemas.settings.findOneAndUpdate({"dataId": request.params.criteria}, request.payload, { new: true });
+                        result = await DBSchemas.settings.findOneAndUpdate(request.query, request.payload, { new: true });
                     break;
                     case "accounts":
-                        result = await DBSchemas.accounts.findOneAndUpdate({"auth.username": request.params.criteria}, request.payload, { new: true });
+                        result = await DBSchemas.accounts.findOneAndUpdate(request.query, request.payload, { new: true });
                     break;
                     case "contents":
-                        result = await DBSchemas.contents.findOneAndUpdate({"contentId": request.params.criteria}, request.payload, { new: true });
+                        result = await DBSchemas.contents.findOneAndUpdate(request.query, request.payload, { new: true });
+                        result.markModified("data.main");
                     break;
                 }
                 return h.response(result);
@@ -128,22 +140,22 @@ const main = async () => {
         }
     });
 
-    //Delete Data
+    //Delete Single Data
     server.route({
         method: "DELETE",
-        path: "/data/db/{collection}/{criteria}",
+        path: "/data/db/single/{collection}",
         handler: async (request, h) => {
             try {
                 var result;
                 switch(request.params.collection){
                     case "settings":
-                        result = await DBSchemas.settings.findOneAndDelete({"dataId": request.params.criteria});
+                        result = await DBSchemas.settings.findOneAndDelete(request.query);
                     break;
                     case "accounts":
-                        result = await DBSchemas.accounts.findOneAndDelete({"auth.username": request.params.criteria});
+                        result = await DBSchemas.accounts.findOneAndDelete(request.query);
                     break;
                     case "contents":
-                        result = await DBSchemas.contents.findOneAndDelete({"contentId": request.params.criteria});
+                        result = await DBSchemas.contents.findOneAndDelete(request.query);
                     break;
                 }
                 return h.response(result);

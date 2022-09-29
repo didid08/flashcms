@@ -18,10 +18,10 @@
   "homepage": "https://github.com/didid08/flashcms#readme",
   "private": true,
   "dependencies": {
-    "@hapi/basic": "^5.1.0",
-    "@hapi/bell": "^10.1.0",
-    "@hapi/hapi": "^18.3.1",
-    "@hapi/joi": "^15.0.3",
+    "@hapi/basic": "^5.1.1",
+    "@hapi/bell": "^10.1.1",
+    "@hapi/hapi": "^18.4.1",
+    "@hapi/joi": "^15.1.1",
     "bcrypt": "^3.0.6",
     "mongoose": "^5.5.11",
     "qs": "^6.7.0"
